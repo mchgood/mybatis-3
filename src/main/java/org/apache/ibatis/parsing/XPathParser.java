@@ -15,12 +15,11 @@
  */
 package org.apache.ibatis.parsing;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import org.apache.ibatis.builder.BuilderException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.*;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -29,16 +28,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-
-import org.apache.ibatis.builder.BuilderException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Clinton Begin
@@ -46,10 +41,26 @@ import org.xml.sax.SAXParseException;
  */
 public class XPathParser {
 
+  /**
+   * Document 对象
+   */
   private final Document document;
+
+  /**
+   * 是否开启验证
+   */
   private boolean validation;
+  /**
+   * 用于加载本地 DTD 文件
+   */
   private EntityResolver entityResolver;
+  /**
+   * mybatis-config.xml 中 <properties/>标签定义一的键值对集合
+   */
   private Properties variables;
+  /**
+   * XPath 对象
+   */
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -142,6 +153,7 @@ public class XPathParser {
 
   public String evalString(Object root, String expression) {
     String result = (String) evaluate(expression, root, XPathConstants.STRING);
+    // 处理相应节点默认值
     result = PropertyParser.parse(result, variables);
     return result;
   }
@@ -229,8 +241,11 @@ public class XPathParser {
 
   private Document createDocument(InputSource inputSource) {
     // important: this must only be called AFTER common constructor
+    // 调用 createOocument （）方法之前一定要先调用 commonConstructor （）方法完成初始化
     try {
+      // 创建 OocumentBuilderFactory 对象
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      // 对 OocumentBuilderFactory 对象进行一系列配置
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       factory.setValidating(validation);
 
@@ -240,8 +255,11 @@ public class XPathParser {
       factory.setCoalescing(false);
       factory.setExpandEntityReferences(true);
 
+      // 创建 OocumentBuilder 对象并进行配置
       DocumentBuilder builder = factory.newDocumentBuilder();
+      // 设置 EntityResolver 接口对象
       builder.setEntityResolver(entityResolver);
+      // 设置错误回调
       builder.setErrorHandler(new ErrorHandler() {
         @Override
         public void error(SAXParseException exception) throws SAXException {
@@ -258,6 +276,7 @@ public class XPathParser {
           // NOP
         }
       });
+      // 加载 XML 文件
       return builder.parse(inputSource);
     } catch (Exception e) {
       throw new BuilderException("Error creating document instance.  Cause: " + e, e);

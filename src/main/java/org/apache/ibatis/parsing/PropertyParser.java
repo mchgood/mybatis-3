@@ -30,6 +30,9 @@ public class PropertyParser {
    *   The default value is {@code false} (indicate disable a default value on placeholder)
    *   If you specify the {@code true}, you can specify key and default value on placeholder (e.g. {@code ${db.username:postgres}}).
    * </p>
+   * <p>
+   *   在 mybatis-config.xml 中<properties/>节点下自己置是否开启默认值功能的对应配置项
+   * </p>
    * @since 3.4.2
    */
   public static final String KEY_ENABLE_DEFAULT_VALUE = KEY_PREFIX + "enable-default-value";
@@ -38,6 +41,9 @@ public class PropertyParser {
    * The special property key that specify a separator for key and default value on placeholder.
    * <p>
    *   The default separator is {@code ":"}.
+   * </p>
+   * <p>
+   *  配置占位符与默认值之间的默认分隔符的对应配置项
    * </p>
    * @since 3.4.2
    */

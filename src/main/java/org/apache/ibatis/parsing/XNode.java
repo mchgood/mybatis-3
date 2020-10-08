@@ -15,28 +15,43 @@
  */
 package org.apache.ibatis.parsing;
 
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 /**
  * @author Clinton Begin
  */
 public class XNode {
 
+  /**
+   * org.w3c.dorn.Node 对象
+   */
   private final Node node;
+  /**
+   * Node 节点名称
+   */
   private final String name;
+  /**
+   * 节点的内容
+   */
   private final String body;
+  /**
+   * 节点属性集合
+   */
   private final Properties attributes;
+  /**
+   * mybatis-config.xml 配置文件中<properties/>节点下定义的键位对
+   */
   private final Properties variables;
+  /**
+   * 前面介绍的 X PathParser 对象，该 XNode 对象由此 XPathParser 对象生成
+   */
   private final XPathParser xpathParser;
 
   public XNode(XPathParser xpathParser, Node node, Properties variables) {
