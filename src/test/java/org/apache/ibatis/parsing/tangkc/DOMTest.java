@@ -1,5 +1,7 @@
 package org.apache.ibatis.parsing.tangkc;
 
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -13,6 +15,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
 
 
 /**
@@ -82,4 +87,46 @@ public class DOMTest {
     }
   }
 
+  @Test
+  public void xpathParserTest() throws Exception{
+    String str = "<inventory>\n" +
+      "  <book year=\"2000\">\n" +
+      "    <title>Snow Crash</title>\n" +
+      "    <author>Neal Stephenson</author>\n" +
+      "    <publisher>Spectra</publisher>\n" +
+      "    <isbn>0553380958</isbn>\n" +
+      "    <price>14.95</price>\n" +
+      "  </book>\n" +
+      "\n" +
+      "  <book year=\"2005\">\n" +
+      "    <title>Burning Tower</title>\n" +
+      "    <author>Larry Niven</author>\n" +
+      "    <author>Jerry Pournelle</author>\n" +
+      "    <publisher>Pocket</publisher>\n" +
+      "    <isbn>074341691</isbn>\n" +
+      "    <price>5.99</price>\n" +
+      "  </book>\n" +
+      "\n" +
+      "  <book year=\"1995\">\n" +
+      "    <title>Zodiac</title>\n" +
+      "    <author>Neal Stephenson</author>\n" +
+      "    <publisher>Spectra</publisher>\n" +
+      "    <isbn>0553573862</isbn>\n" +
+      "    <price>7.50</price>\n" +
+      "  </book>\n" +
+      "</inventory>";
+    try (InputStream inputStream = new ByteArrayInputStream(str.getBytes())){
+      XPathParser parser = new XPathParser(inputStream, false);
+      Float price = parser.evalFloat("/inventory/book/price");
+      XNode xNode = parser.evalNode("//book[@year>1997]/title/text()");
+      List<XNode> xNodes = parser.evalNodes("//book");
+      for (XNode node : xNodes) {
+        String name = node.getName();
+        String stringBody = node.getStringBody();
+        String year = node.getStringAttribute("year");
+        System.out.println(name.toString());
+        System.out.println(year.toString());
+      }
+    }
+  }
 }
